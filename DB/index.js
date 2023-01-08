@@ -1,6 +1,7 @@
 import { getOrders } from './MeLi/index.js'
 import { getRows } from './connections/GoogleAPI.js'
-import * as json from './connections/cred.json' assert { type: 'json' }
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 
 const objectKeys = [
   'Estado',
@@ -43,14 +44,14 @@ const objectKeys = [
 ]
 
 const PostOrdersToMeli = async () => {
-  const orders = await getOrders('2023-01-05')
+  const orders = await getOrders('2023-01-06')
   const array = []
 
   orders.map((order) => {
     array.push(Object.values(order))
   })
-  console.log(array)
 
+  await writeFile(filePath, JSON.stringify(array, null, 2))
   return array
 }
 
@@ -70,6 +71,9 @@ const getOrdersFromGoogle = async () => {
   return orders
 }
 
-const allOrders = await getOrdersFromGoogle()
+// const allOrders = await getOrdersFromGoogle()
 
-console.log(allOrders)
+const filePath = join(process.cwd(), './DB/test.json')
+// await writeFile(filePath, JSON.stringify(allOrders, null, 2))
+
+await PostOrdersToMeli()

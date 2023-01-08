@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+// import axios from 'axios'
 
 dotenv.config()
 
@@ -55,7 +56,7 @@ const getIds = async (token, from) => {
 export const getOrders = async (from) => {
   const token = await getToken()
   const ids = await getIds(token, from)
-
+  console.log(token)
   const header = {
     Authorization: `Bearer ${token}`,
   }
@@ -66,7 +67,8 @@ export const getOrders = async (from) => {
         method: 'GET',
         headers: header,
       })
-      const res_dni = await fetch(
+
+      const resDni = await fetch(
         `https://api.mercadolibre.com/orders/${id}/billing_info`,
         {
           method: 'GET',
@@ -76,20 +78,31 @@ export const getOrders = async (from) => {
 
       const body = await res.json()
       const shipId = body.shipping.id
-
-      const res_ship = await fetch(
+      const resShip = await fetch(
         `https://api.mercadolibre.com/shipments/${shipId}`,
         {
           method: 'GET',
           headers: header,
         }
       )
+      const mpId = body.id
 
-      const body_ship = await res_ship.json()
+      const resPayment = await fetch(
+        `https://api.mercadopago.com/v1/payments/search?external_reference=${mpId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: AUTH_MERCADOPAGO,
+            Accept: 'application/json',
+          },
+        }
+      )
 
-      const body_dni = await res_dni.json()
+      const bodyShip = await resShip.json()
+      const bodyDoc = await resDni.json()
+      const bodyPayment = await resPayment.json()
 
-      const order = setOrder(body, body_ship)
+      const order = setOrder(body, bodyDoc, bodyShip, bodyPayment)
       return order
     })
   )
@@ -97,24 +110,73 @@ export const getOrders = async (from) => {
     return new Date(a.dateCreated) - new Date(b.dateCreated)
   })
 
-  orders.map((order) => {
-    console.log(order)
-  })
-
   return orders
 }
 
-const setOrder = (object, objectShip) => {
-  const order = {
-    dateUsFormat: new Date(object.date_created).toLocaleDateString('sv-SE', {
+const setOrder = (object, objectDocs, objectShip, objectPayment) => {
+  const dateUsFormat = new Date(object.date_created).toLocaleDateString(
+    'sv-SE',
+    {
       timeZone: 'America/Argentina/Buenos_Aires',
-    }),
+    }
+  )
+
+  const {
+    mpCost,
+    ganancias,
+    iva,
+    tiendaFee,
+    sirtac,
+    otrosImp,
+    dateReleased,
+    received,
+    cuotas,
+  } = parseMP(objectPayment)
+
+  const order = {
+    formula: `=LEFTB("${dateUsFormat}";10)`,
+    orderId: object.id,
     dateCreated: new Date(object.date_created).toLocaleString('es-AR', {
       timeZone: 'America/Argentina/Buenos_Aires',
     }),
-    orderId: object.id,
+    orderBuyer: `${object.buyer.first_name} ${object.buyer.last_name}`,
+    orderDNI: objectDocs.billing_info.doc_number,
+    product: object.order_items[0].item.title,
+    price: object.order_items[0].full_unit_price.toLocaleString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+    }),
+    quantity: object.order_items[0].quantity,
+    currency: object.currency_id,
+    shipId: `="${object.shipping.id}"`,
     orderStatus: object.status,
-    orderBuyer: object.buyer.nickname,
+    buyerNick: `"=${object.buyer.nickname}"`,
+    packId: `="${object.pack_id}"`,
+    shipCost: objectShip.shipping_option.cost
+      ? objectShip.shipping_option.cost.toLocaleString('es-AR', {
+          timeZone: 'America/Argentina/Buenos_Aires',
+        })
+      : null,
+    baseCost: objectShip.base_cost
+      ? objectShip.base_cost.toLocaleString('es-AR', {
+          timeZone: 'America/Argentina/Buenos_Aires',
+        })
+      : null,
+    loyaltyDiscount: objectShip.cost_components.loyalty_discount
+      ? objectShip.cost_components.loyalty_discount.toLocaleString('es-AR', {
+          timeZone: 'America/Argentina/Buenos_Aires',
+        })
+      : null,
+    logisticType: objectShip.logistic_type ? objectShip.logistic_type : null,
+    shipStatus: objectShip.status ? objectShip.status : null,
+    stateName: objectShip.receiver_address.state.name
+      ? objectShip.receiver_address.state.name
+      : null,
+    cityName: objectShip.receiver_address.city.name
+      ? objectShip.receiver_address.city.name
+      : null,
+    zipCode: objectShip.receiver_address.zip_code
+      ? objectShip.receiver_address.zip_code
+      : null,
     shipDate: objectShip.status_history.date_shipped
       ? new Date(objectShip.status_history.date_shipped).toLocaleString(
           'es-AR',
@@ -123,7 +185,119 @@ const setOrder = (object, objectShip) => {
           }
         )
       : null,
+    deliverDate: objectShip.status_history.date_delivered
+      ? new Date(objectShip.status_history.date_delivered).toLocaleString(
+          'es-AR',
+          {
+            timeZone: 'America/Argentina/Buenos_Aires',
+          }
+        )
+      : null,
+    notDeliverDate: objectShip.status_history.date_not_delivered
+      ? new Date(objectShip.status_history.date_not_delivered).toLocaleString(
+          'es-AR',
+          {
+            timeZone: 'America/Argentina/Buenos_Aires',
+          }
+        )
+      : null,
+    mpCost: mpCost,
+    iva: iva,
+    ganancias: ganancias,
+    sirtac: sirtac,
+    otrosImp: otrosImp,
+    tiendaFee: tiendaFee,
+    dateReleased: dateReleased,
+    cuotas: cuotas,
+    received: received,
   }
 
   return order
+}
+
+const parseMP = (object) => {
+  const payment = object.results.filter((payment) => {
+    return payment.status === 'approved'
+  })
+  let mpCost = 0
+  let ganancias = 0
+  let iva = 0
+  let tiendaFee = 0
+  let sirtac = 0
+  let otrosImp = 0
+
+  let received = 0
+  let cuotas = 0
+  let datereleased = null
+
+  payment.map((payment) => {
+    received = payment.transaction_details.net_received_amount
+    cuotas = payment.installments
+
+    if (payment.money_release_date) {
+      datereleased = new Date(payment.money_release_date).toLocaleString(
+        'es-AR',
+        {
+          timeZone: 'America/Argentina/Buenos_Aires',
+        }
+      )
+    }
+
+    payment.charges_details.map((charge) => {
+      if (charge.name === 'meli_fee') {
+        mpCost += charge.amounts.original
+        return
+      }
+      if (charge.name === 'tax_withholding-retencion_ganancias') {
+        ganancias += charge.amounts.original
+        return
+      }
+      if (charge.name === 'tax_withholding-retencion_iva') {
+        iva += charge.amounts.original
+        return
+      }
+      if (charge.name === 'third_payment') {
+        tiendaFee += charge.amounts.original
+        return
+      }
+      if (charge.name.includes('sirtac')) {
+        sirtac += charge.amounts.original
+        return
+      }
+      if (
+        charge.name === 'shp_fulfillment' ||
+        charge.name === 'ship_fulfillment' ||
+        charge.name === 'coupon_off'
+      )
+        return
+      otrosImp += charge.amounts.original
+      return
+    })
+  })
+
+  return {
+    mpCost: mpCost.toLocaleString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+    }),
+    ganancias: ganancias.toLocaleString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+    }),
+    iva: iva.toLocaleString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+    }),
+    tiendaFee: tiendaFee.toLocaleString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+    }),
+    sirtac: sirtac.toLocaleString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+    }),
+    otrosImp: otrosImp.toLocaleString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+    }),
+    received: received.toLocaleString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+    }),
+    cuotas: cuotas,
+    dateReleased: datereleased,
+  }
 }
