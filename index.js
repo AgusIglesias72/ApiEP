@@ -21,7 +21,7 @@ app.get('/', (_, res) => {
 })
 
 app.get('/orders', (_, res) => {
-  return res.send(data)
+  return res.send(JSON.parse(data))
 })
 
 app.post('/orders', async (req, res) => {
