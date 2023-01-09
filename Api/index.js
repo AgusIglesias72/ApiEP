@@ -7,7 +7,7 @@ const app = new Hono()
 
 app.use('/*', cors())
 
-const data = fs.readFileSync('./DB/data.json', 'utf8')
+const data = fs.readFileSync('../DB/data.json', 'utf8')
 
 app.get('/', (ctx) => {
   return ctx.json([
