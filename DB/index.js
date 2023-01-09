@@ -43,17 +43,7 @@ const objectKeys = [
   'TotalJuegos',
 ]
 
-const PostOrdersToMeli = async () => {
-  const orders = await getOrders('2023-01-06')
-  const array = []
-
-  orders.map((order) => {
-    array.push(Object.values(order))
-  })
-
-  await writeFile(filePath, JSON.stringify(array, null, 2))
-  return array
-}
+const filePath = join(process.cwd(), './DB/data.json')
 
 const toArrayOfObjects = (keys, values) => {
   return values.map((value) => {
@@ -64,16 +54,21 @@ const toArrayOfObjects = (keys, values) => {
   })
 }
 
-const getOrdersFromGoogle = async () => {
-  const response = await getRows('Cada Venta!A1:AK')
-  const values = response.data.values
-  const orders = toArrayOfObjects(objectKeys, values)
-  return orders
+const PostOrdersToMeli = async () => {
+  const orders = await getOrders('2023-01-06')
+  const array = []
+
+  orders.map((order) => {
+    array.push(Object.values(order))
+  })
+
+  return array
 }
 
-// const allOrders = await getOrdersFromGoogle()
-
-const filePath = join(process.cwd(), './DB/test.json')
-// await writeFile(filePath, JSON.stringify(allOrders, null, 2))
-
-await PostOrdersToMeli()
+export const getOrdersFromGoogle = async () => {
+  const response = await getRows('Cada Venta!A2:AK')
+  const values = response.data.values
+  const orders = toArrayOfObjects(objectKeys, values)
+  await writeFile(filePath, JSON.stringify(orders, null, 2))
+  return orders
+}
