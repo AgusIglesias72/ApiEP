@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import data from '../DB/data.json' assert { type: 'json' }
+import data from '../DB/data.json'
 import { getOrdersFromGoogle } from '../DB/index.js'
 
 const app = new Hono()
