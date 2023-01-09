@@ -8,7 +8,8 @@
     "dev:api": "wrangler dev Api/index.js",
     "publish:api": "wrangler publish Api/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./Api/index.js"
+    "build": "npm install webpack-cli && webpack",
+    "start": "node ."
   },
   "keywords": [],
   "author": "",
@@ -17,7 +18,12 @@
     "axios": "^1.2.2",
     "dotenv": "^16.0.3",
     "googleapis": "^110.0.0",
-    "hono": "^2.7.2"
+    "hono": "^2.7.2",
+    "http2": "^3.3.7",
+    "nodemon": "^2.0.20",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
     "vitest": "^0.26.3",

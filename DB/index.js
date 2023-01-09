@@ -1,7 +1,7 @@
 import { getOrders } from './MeLi/index.js'
 import { getRows } from './connections/GoogleAPI.js'
-import { writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import fs from 'fs'
+import { join } from 'path'
 
 const objectKeys = [
   'Estado',
@@ -43,7 +43,7 @@ const objectKeys = [
   'TotalJuegos',
 ]
 
-const filePath = join(process.cwd(), './DB/data.txt')
+const filePath = join(process.cwd(), './DB/data.json')
 
 const toArrayOfObjects = (keys, values) => {
   return values.map((value) => {
@@ -69,6 +69,6 @@ export const getOrdersFromGoogle = async () => {
   const response = await getRows('Cada Venta!A2:AK')
   const values = response.data.values
   const orders = toArrayOfObjects(objectKeys, values)
-  await writeFile(filePath, JSON.stringify(orders, null, 2))
+  fs.writeFileSync(filePath, JSON.stringify(orders, null, 2))
   return orders
 }

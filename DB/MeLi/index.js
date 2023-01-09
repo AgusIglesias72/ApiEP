@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-// import axios from 'axios'
+import axios from 'axios'
 
 dotenv.config()
 
@@ -18,15 +18,13 @@ const URLS = {
 
 const getToken = async () => {
   console.log('Ejecutando getToken')
-  const res = await fetch(URLS.tokenUrl, {
-    method: 'POST',
+  const res = await axios.post(URLS.tokenUrl, {
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
   })
-  const body = await res.json()
-  const token = body.access_token
+  const token = res.data.access_token
   return token
 }
 
@@ -40,11 +38,10 @@ const getIds = async (token, from) => {
   const ids = []
 
   for (let i = 0; i < 2000; i += 50) {
-    const res = await fetch(url(i, from), {
-      method: 'GET',
+    const res = await axios.get(url(i, from), {
       headers: header,
     })
-    const body = await res.json()
+    const body = res.data
 
     body.results.map((order) => {
       ids.push(order.id)
@@ -63,34 +60,29 @@ export const getOrders = async (from) => {
 
   const orders = await Promise.all(
     ids.map(async (id) => {
-      const res = await fetch(`https://api.mercadolibre.com/orders/${id}`, {
-        method: 'GET',
+      const res = await axios.get(`https://api.mercadolibre.com/orders/${id}`, {
         headers: header,
       })
-
-      const resDni = await fetch(
+      const resDni = await axios.get(
         `https://api.mercadolibre.com/orders/${id}/billing_info`,
         {
-          method: 'GET',
           headers: header,
         }
       )
 
-      const body = await res.json()
+      const body = res.data
       const shipId = body.shipping.id
-      const resShip = await fetch(
+
+      const resShip = await axios.get(
         `https://api.mercadolibre.com/shipments/${shipId}`,
         {
-          method: 'GET',
           headers: header,
         }
       )
       const mpId = body.id
-
-      const resPayment = await fetch(
+      const resPayment = await axios.get(
         `https://api.mercadopago.com/v1/payments/search?external_reference=${mpId}`,
         {
-          method: 'GET',
           headers: {
             Authorization: AUTH_MERCADOPAGO,
             Accept: 'application/json',
@@ -98,9 +90,9 @@ export const getOrders = async (from) => {
         }
       )
 
-      const bodyShip = await resShip.json()
-      const bodyDoc = await resDni.json()
-      const bodyPayment = await resPayment.json()
+      const bodyShip = resShip.data
+      const bodyDoc = resDni.data
+      const bodyPayment = resPayment.data
 
       const order = setOrder(body, bodyDoc, bodyShip, bodyPayment)
       return order
