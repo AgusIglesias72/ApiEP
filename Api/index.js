@@ -1,33 +1,24 @@
-// import { Hono } from 'hono'
-import express from 'express'
+import { Hono } from 'hono'
 import data from '../DB/data.json' assert { type: 'json' }
-import { getOrdersFromGoogle } from '../DB/index.js'
+// import { getOrdersFromGoogle } from '../DB/index.js'
 
-const app = express()
+const app = new Hono()
 
-app.use(express.json())
-
-const PORT = process.env.PORT ?? 3000
-
-app.get('/', (_req, res) => {
-  return res.status(200).send([
+app.get('/', (ctx) => {
+  return ctx.json([
     {
       message: 'Hello World',
     },
   ])
 })
 
-app.get('/orders', (_req, res) => {
-  return res.status(200).send(data)
+app.get('/orders', (ctx) => {
+  return ctx.json(data)
 })
 
-app.post('/orders', async (_req, res) => {
-  const orders = await getOrdersFromGoogle('2023-01-06')
-  return res.status(200).send(orders)
-})
-
-app.listen(PORT, () => {
-  console.log(`Server running port ${PORT}`)
-})
+// app.post('/orders', async (ctx) => {
+//   const orders = await getOrdersFromGoogle('2023-01-06')
+//   return ctx.json(orders)
+// })
 
 export default app
