@@ -1,29 +1,34 @@
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
+import express from 'express'
 import fs from 'fs'
 import { getOrdersFromGoogle } from '../DB/index.js'
+import cors from 'cors'
 
-const app = new Hono()
+const app = express()
 
-app.use('/*', cors())
+app.use(express.json())
+app.use(cors())
+
+const PORT = process.env.PORT ?? 3000
 
 const data = fs.readFileSync('../DB/data.json', 'utf8')
 
-app.get('/', (ctx) => {
-  return ctx.json([
+app.get('/', (_, res) => {
+  return res.send([
     {
       message: 'Hello World',
     },
   ])
 })
 
-app.get('/orders', (ctx) => {
-  return ctx.json(data)
+app.get('/orders', (_, res) => {
+  return res.send(data)
 })
 
-app.post('/orders', async (ctx) => {
+app.post('/orders', async (req, res) => {
   const orders = await getOrdersFromGoogle('2023-01-06')
-  return ctx.json(orders)
+  return res.send(orders)
 })
 
-export default app
+app.listen(PORT, () => {
+  console.log(`Server running port ${PORT}`)
+})
