@@ -2,7 +2,7 @@
   "name": "newapi",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./Api/index.js",
   "type": "module",
   "scripts": {
     "dev:api": "wrangler dev Api/index.js",
