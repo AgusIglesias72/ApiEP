@@ -43,7 +43,7 @@ const objectKeys = [
   'TotalJuegos',
 ]
 
-const filePath = join(process.cwd(), './DB/data.json')
+const filePath = join(process.cwd(), './DB/data.txt')
 
 const toArrayOfObjects = (keys, values) => {
   return values.map((value) => {
