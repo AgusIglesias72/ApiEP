@@ -1,6 +1,6 @@
 import express from 'express'
 import fs from 'fs'
-import { getOrdersFromGoogle } from '../DB/index.js'
+import { getOrdersFromGoogle } from './DB/index.js'
 import cors from 'cors'
 
 const app = express()
@@ -10,7 +10,7 @@ app.use(cors())
 
 const PORT = process.env.PORT ?? 3000
 
-const data = fs.readFileSync('../DB/data.json', 'utf8')
+const data = fs.readFileSync('./DB/data.json', 'utf8')
 
 app.get('/', (_, res) => {
   return res.send([

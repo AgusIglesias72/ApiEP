@@ -2,11 +2,11 @@
   "name": "newapi",
   "version": "1.0.0",
   "description": "",
-  "main": "./Api/index.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev:api": "wrangler dev Api/index.js",
-    "publish:api": "wrangler publish Api/index.js",
+    "dev:api": "wrangler dev index.js",
+    "publish:api": "wrangler publish index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm install webpack-cli && webpack",
     "start": "node ."
