@@ -25,8 +25,7 @@ app.get('/orders', (_, res) => {
 })
 
 app.post('/orders', async (req, res) => {
-  const date = req.body.date
-  const orders = await getOrdersFromGoogle(date)
+  const orders = await getOrdersFromGoogle()
   return res.send(orders)
 })
 
