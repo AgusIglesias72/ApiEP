@@ -10,8 +10,6 @@ app.use(cors())
 
 const PORT = process.env.PORT ?? 3000
 
-const data = fs.readFileSync('./DB/data.json', 'utf8')
-
 app.get('/', (_, res) => {
   return res.send([
     {
@@ -21,6 +19,7 @@ app.get('/', (_, res) => {
 })
 
 app.get('/orders', (_, res) => {
+  const data = fs.readFileSync('./DB/data.json', 'utf8')
   return res.send(JSON.parse(data))
 })
 
