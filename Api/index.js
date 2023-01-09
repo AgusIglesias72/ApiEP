@@ -11,7 +11,7 @@ app.get('/', async (ctx) => {
   return ctx.json([
     { endpoint: '/orders' },
     { method: 'GET' },
-    { description: 'Returns all orders' },
+    { description: 'all orders' },
   ])
 })
 
