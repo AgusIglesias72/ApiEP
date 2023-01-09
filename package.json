@@ -10,7 +10,7 @@
     "build": "webpack",
     "dev": "nodemon Api/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./Api/index.js"
+    "start": "node ."
   },
   "keywords": [],
   "author": "",

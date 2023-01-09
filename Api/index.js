@@ -9,16 +9,16 @@ app.use(express.json())
 
 const PORT = process.env.PORT ?? 3000
 
-app.get('/orders', (_req, res) => {
-  return res.status(200).send(data)
-})
-
 app.get('/', (_req, res) => {
   return res.status(200).send([
     {
       message: 'Hello World',
     },
   ])
+})
+
+app.get('/orders', (_req, res) => {
+  return res.status(200).send(data)
 })
 
 app.post('/orders', async (_req, res) => {
