@@ -2,12 +2,12 @@ name: Automatic Run
 
 on:
   workflow_dispatch:
-  
+
   repository_dispatch:
     types:
       - webhook
   schedule:
-  - cron: "0 7 * * *"
+    - cron: '0 7 * * *'
 
 jobs:
   build:
@@ -19,6 +19,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+          run_install: true
       - run: |
           node Scripts/index.js
           git config user.name apiep
