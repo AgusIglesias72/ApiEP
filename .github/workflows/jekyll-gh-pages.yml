@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Build Project
-        run: npm build
+        run: npm run build
       - name: Start Project
         run: npm start
 
