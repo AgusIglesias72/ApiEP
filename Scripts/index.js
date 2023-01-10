@@ -1,4 +1,4 @@
-import { getOrdersFromGoogle, PostOrdersToMeli } from '../DB'
+import { getOrdersFromGoogle, PostOrdersToMeli } from '../DB/index.js'
 
 await getOrdersFromGoogle()
 
