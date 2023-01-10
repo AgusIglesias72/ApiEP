@@ -43,8 +43,7 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Build Project
         run: npm run build
-      - name: Start Project
-        run: npm start
+
 
   # Deployment job
   deploy:
