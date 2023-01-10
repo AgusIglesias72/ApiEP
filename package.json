@@ -8,7 +8,7 @@
     "dev:api": "wrangler dev index.js",
     "publish:api": "wrangler publish index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm install webpack-cli && webpack",
+    "build": "webpack",
     "start": "node ."
   },
   "keywords": [],

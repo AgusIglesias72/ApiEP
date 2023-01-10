@@ -1,5 +1,5 @@
 import { getOrders } from './MeLi/index.js'
-import { getRows } from './connections/GoogleAPI.js'
+import { getRows, appendData, clearData } from './connections/GoogleAPI.js'
 import fs from 'fs'
 import { join } from 'path'
 
@@ -54,15 +54,26 @@ const toArrayOfObjects = (keys, values) => {
   })
 }
 
-const PostOrdersToMeli = async () => {
-  const orders = await getOrders('2023-01-06')
+export const PostOrdersToMeli = async (date) => {
+  const res = await getRows('Mercado Libre!AT2:AT')
+  const values = res.data.values
+  let data
+  let index
+  if (values && values.length > 0) {
+    index = values.findIndex((value) => value[0] == [date]) + 2
+    const range = `Mercado Libre!AT${index}:CM`
+    if (index > 1) await clearData(range)
+  }
+  const orders = await getOrders(date)
   const array = []
 
   orders.map((order) => {
     array.push(Object.values(order))
   })
 
-  return array
+  const response = await appendData('Mercado Libre!AT2', array)
+
+  return response
 }
 
 export const getOrdersFromGoogle = async () => {

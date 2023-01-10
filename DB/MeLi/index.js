@@ -127,10 +127,12 @@ const setOrder = (object, objectDocs, objectShip, objectPayment) => {
 
   const order = {
     formula: `=LEFTB("${dateUsFormat}";10)`,
-    orderId: object.id,
-    dateCreated: new Date(object.date_created).toLocaleString('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-    }),
+    orderId: `="${object.id}"`,
+    dateCreated: new Date(object.date_created)
+      .toLocaleString('es-AR', {
+        timeZone: 'America/Argentina/Buenos_Aires',
+      })
+      .replace(',', ''),
     orderBuyer: `${object.buyer.first_name} ${object.buyer.last_name}`,
     orderDNI: objectDocs.billing_info.doc_number,
     product: object.order_items[0].item.title,
@@ -141,7 +143,8 @@ const setOrder = (object, objectDocs, objectShip, objectPayment) => {
     currency: object.currency_id,
     shipId: `="${object.shipping.id}"`,
     orderStatus: object.status,
-    buyerNick: `"=${object.buyer.nickname}"`,
+    buyerNick: object.buyer.nickname,
+    buyerId: `="${object.buyer.id}"`,
     packId: `="${object.pack_id}"`,
     shipCost: objectShip.shipping_option.cost
       ? objectShip.shipping_option.cost.toLocaleString('es-AR', {
@@ -170,28 +173,25 @@ const setOrder = (object, objectDocs, objectShip, objectPayment) => {
       ? objectShip.receiver_address.zip_code
       : null,
     shipDate: objectShip.status_history.date_shipped
-      ? new Date(objectShip.status_history.date_shipped).toLocaleString(
-          'es-AR',
-          {
+      ? new Date(objectShip.status_history.date_shipped)
+          .toLocaleString('es-AR', {
             timeZone: 'America/Argentina/Buenos_Aires',
-          }
-        )
+          })
+          .replace(',', '')
       : null,
     deliverDate: objectShip.status_history.date_delivered
-      ? new Date(objectShip.status_history.date_delivered).toLocaleString(
-          'es-AR',
-          {
+      ? new Date(objectShip.status_history.date_delivered)
+          .toLocaleString('es-AR', {
             timeZone: 'America/Argentina/Buenos_Aires',
-          }
-        )
+          })
+          .replace(',', '')
       : null,
     notDeliverDate: objectShip.status_history.date_not_delivered
-      ? new Date(objectShip.status_history.date_not_delivered).toLocaleString(
-          'es-AR',
-          {
+      ? new Date(objectShip.status_history.date_not_delivered)
+          .toLocaleString('es-AR', {
             timeZone: 'America/Argentina/Buenos_Aires',
-          }
-        )
+          })
+          .replace(',', '')
       : null,
     mpCost: mpCost,
     iva: iva,
@@ -290,6 +290,6 @@ const parseMP = (object) => {
       timeZone: 'America/Argentina/Buenos_Aires',
     }),
     cuotas: cuotas,
-    dateReleased: datereleased,
+    dateReleased: datereleased ? datereleased.replace(',', '') : datereleased,
   }
 }
