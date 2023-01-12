@@ -5,11 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev:api": "wrangler dev index.js",
-    "publish:api": "wrangler publish index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "start": "node ."
+    "start": "node .",
+    "dev": "nodemon ."
   },
   "keywords": [],
   "author": "",

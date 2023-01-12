@@ -8,7 +8,7 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
-const PORT = process.env.PORT ?? 3000
+const PORT = process.env.PORT ?? 8000
 
 app.get('/', (_, res) => {
   return res.send([
@@ -18,14 +18,41 @@ app.get('/', (_, res) => {
   ])
 })
 
-app.get('/orders', (_, res) => {
-  const data = fs.readFileSync('./DB/data.json', 'utf8')
-  return res.send(JSON.parse(data))
+app.get('/orders', (req, res) => {
+  const page = req.query.page ?? 1
+  const canal = req.query.canal ?? 'all'
+  let data = fs.readFileSync('./DB/data.json', 'utf8')
+  data = JSON.parse(data)
+  if (canal !== 'all') {
+    data = data.filter((order) => order.CanalVenta === canal)
+  }
+  const from = (page - 1) * 50
+  const to = (page - 1) * 50 + 50
+  const orders = data.slice(from, to)
+  return res.send({
+    totalLenght: data.length,
+    page: page,
+    limit: 50,
+    orders,
+  })
 })
 
-app.post('/orders', async (req, res) => {
-  const orders = await getOrdersFromGoogle()
-  return res.send(orders)
+app.get('/orders/:id', (req, res) => {
+  const id = req.params.id
+  let data = fs.readFileSync('./DB/data.json', 'utf8')
+  data = JSON.parse(data)
+  const order = data.find((order) => order.IdPedido === id)
+  const associatedOrders = data.filter(
+    (item) =>
+      ((item.DNI === order.DNI && item.DNI !== '') ||
+        (item.Mail === order.Mail && item.Mail !== '')) &&
+      item.IdPedido !== order.IdPedido
+  )
+  return res.send({
+    length: associatedOrders.length,
+    order,
+    associatedOrders,
+  })
 })
 
 app.listen(PORT, () => {
