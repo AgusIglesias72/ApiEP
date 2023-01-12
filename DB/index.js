@@ -43,21 +43,56 @@ const objectKeys = [
   'TotalJuegos',
 ]
 
+const numericKeys = [
+  'Desconectados',
+  'Destapados',
+  'ANuevo',
+  'DesconectadosX2',
+  'ComboDescDest',
+  'ComboDescAnoNuevo',
+  'TotalDesconectados',
+  'TotalDestapados',
+  'TotalANuevo',
+  'CantidadProductos',
+  'TotalJuegos',
+  'DescuentoTotal',
+  'DescuentoCupon',
+  'DescuentoMetodoPago',
+  'DescuentoCantidad',
+  'CostoEnvio',
+  'IngresosBrutos',
+  'IngresosNetos',
+  'RefExterna',
+]
+
 const filePath = join(process.cwd(), './DB/data.json')
 
 const toArrayOfObjects = (keys, values) => {
   return values.map((value) => {
     return keys.reduce((object, key, index) => {
-      object[key] = value[index]
+      if (numericKeys.includes(key)) {
+        object[key] = parseFloat(value[index].replace(',', '.'))
+      } else if (value[index] === '') {
+        object[key] = null
+      } else {
+        object[key] = value[index].trim()
+      }
       return object
     }, {})
   })
 }
 
-export const PostOrdersToMeli = async (date) => {
+const getDateMeli = () => {
+  let date = new Date()
+  date.setDate(date.getDate() - 15)
+  date = date.toISOString().split('T')[0]
+  return date
+}
+
+export const PostOrdersToMeli = async () => {
+  const date = getDateMeli()
   const res = await getRows('Mercado Libre!AT2:AT')
   const values = res.data.values
-  let data
   let index
   if (values && values.length > 0) {
     index = values.findIndex((value) => value[0] == [date]) + 2
@@ -81,5 +116,4 @@ export const getOrdersFromGoogle = async () => {
   const values = response.data.values
   const orders = toArrayOfObjects(objectKeys, values)
   fs.writeFileSync(filePath, JSON.stringify(orders, null, 2))
-  return orders
 }
