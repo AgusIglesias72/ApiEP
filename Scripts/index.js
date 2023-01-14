@@ -4,8 +4,8 @@ import {
   PostOrdersToTN,
 } from '../DB/index.js'
 
-// await getOrdersFromGoogle()
+await getOrdersFromGoogle()
 
-// await PostOrdersToMeli()
+await PostOrdersToMeli()
 
-await PostOrdersToTN()
+// await PostOrdersToTN()
