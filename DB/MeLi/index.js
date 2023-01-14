@@ -1,5 +1,7 @@
 import dotenv from 'dotenv'
 import axios from 'axios'
+import https from 'https'
+import { parseMPforML } from '../utils/index.js'
 
 dotenv.config()
 
@@ -23,6 +25,10 @@ const getToken = async () => {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
+    httpsAgent: new https.Agent({
+      keepAlive: true,
+    }),
+    timeout: 60000,
   })
   const token = res.data.access_token
   return token
@@ -40,6 +46,10 @@ const getIds = async (token, from) => {
   for (let i = 0; i < 2000; i += 50) {
     const res = await axios.get(url(i, from), {
       headers: header,
+      httpsAgent: new https.Agent({
+        keepAlive: true,
+      }),
+      timeout: 60000,
     })
     const body = res.data
 
@@ -62,11 +72,19 @@ export const getOrders = async (from) => {
     ids.map(async (id) => {
       const res = await axios.get(`https://api.mercadolibre.com/orders/${id}`, {
         headers: header,
+        httpsAgent: new https.Agent({
+          keepAlive: true,
+        }),
+        timeout: 60000,
       })
       const resDni = await axios.get(
         `https://api.mercadolibre.com/orders/${id}/billing_info`,
         {
           headers: header,
+          httpsAgent: new https.Agent({
+            keepAlive: true,
+          }),
+          timeout: 60000,
         }
       )
 
@@ -87,6 +105,10 @@ export const getOrders = async (from) => {
             Authorization: AUTH_MERCADOPAGO,
             Accept: 'application/json',
           },
+          httpsAgent: new https.Agent({
+            keepAlive: true,
+          }),
+          timeout: 60000,
         }
       )
 
@@ -123,7 +145,7 @@ const setOrder = (object, objectDocs, objectShip, objectPayment) => {
     dateReleased,
     received,
     cuotas,
-  } = parseMP(objectPayment)
+  } = parseMPforML(objectPayment)
 
   const order = {
     formula: `=LEFTB("${dateUsFormat}";10)`,
@@ -205,91 +227,4 @@ const setOrder = (object, objectDocs, objectShip, objectPayment) => {
   }
 
   return order
-}
-
-const parseMP = (object) => {
-  const payment = object.results.filter((payment) => {
-    return payment.status === 'approved'
-  })
-  let mpCost = 0
-  let ganancias = 0
-  let iva = 0
-  let tiendaFee = 0
-  let sirtac = 0
-  let otrosImp = 0
-
-  let received = 0
-  let cuotas = 0
-  let datereleased = null
-
-  payment.map((payment) => {
-    received = payment.transaction_details.net_received_amount
-    cuotas = payment.installments
-
-    if (payment.money_release_date) {
-      datereleased = new Date(payment.money_release_date).toLocaleString(
-        'es-AR',
-        {
-          timeZone: 'America/Argentina/Buenos_Aires',
-        }
-      )
-    }
-
-    payment.charges_details.map((charge) => {
-      if (charge.name === 'meli_fee') {
-        mpCost += charge.amounts.original
-        return
-      }
-      if (charge.name === 'tax_withholding-retencion_ganancias') {
-        ganancias += charge.amounts.original
-        return
-      }
-      if (charge.name === 'tax_withholding-retencion_iva') {
-        iva += charge.amounts.original
-        return
-      }
-      if (charge.name === 'third_payment') {
-        tiendaFee += charge.amounts.original
-        return
-      }
-      if (charge.name.includes('sirtac')) {
-        sirtac += charge.amounts.original
-        return
-      }
-      if (
-        charge.name === 'shp_fulfillment' ||
-        charge.name === 'ship_fulfillment' ||
-        charge.name === 'coupon_off'
-      )
-        return
-      otrosImp += charge.amounts.original
-      return
-    })
-  })
-
-  return {
-    mpCost: mpCost.toLocaleString('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-    }),
-    ganancias: ganancias.toLocaleString('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-    }),
-    iva: iva.toLocaleString('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-    }),
-    tiendaFee: tiendaFee.toLocaleString('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-    }),
-    sirtac: sirtac.toLocaleString('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-    }),
-    otrosImp: otrosImp.toLocaleString('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-    }),
-    received: received.toLocaleString('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires',
-    }),
-    cuotas: cuotas,
-    dateReleased: datereleased ? datereleased.replace(',', '') : datereleased,
-  }
 }

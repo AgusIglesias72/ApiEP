@@ -1,4 +1,5 @@
 import { getOrders } from './MeLi/index.js'
+import { getTNOrders } from './TN/index.js'
 import { getRows, appendData, clearData } from './connections/GoogleAPI.js'
 import fs from 'fs'
 import { join } from 'path'
@@ -65,7 +66,7 @@ const numericKeys = [
   'RefExterna',
 ]
 
-const filePath = join(process.cwd(), './DB/data.json')
+const filePath = join(process.cwd(), './DB/test.json')
 
 const toArrayOfObjects = (keys, values) => {
   return values.map((value) => {
@@ -86,27 +87,57 @@ const getDateMeli = () => {
   let date = new Date()
   date.setDate(date.getDate() - 15)
   date = date.toISOString().split('T')[0]
-  return date
+  return '2022-12-27'
 }
 
 export const PostOrdersToMeli = async () => {
-  const date = getDateMeli()
-  const res = await getRows('Mercado Libre!AT2:AT')
+  try {
+    const date = getDateMeli()
+    const orders = await getOrders(date)
+
+    const res = await getRows('Mercado Libre!AT2:AT')
+    const values = res.data.values
+    let index
+    if (values && values.length > 0) {
+      index = values.findIndex((value) => value[0] == [date]) + 2
+      const range = `Mercado Libre!AT${index}:CM`
+      if (index > 1) await clearData(range)
+    }
+    const array = []
+
+    orders.map((order) => {
+      array.push(Object.values(order))
+    })
+
+    const response = await appendData('Mercado Libre!AT2', array)
+    return response
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const PostOrdersToTN = async () => {
+  const res = await getRows('Tienda Nube!AU2:AU')
   const values = res.data.values
+  const lastMinus15 = values[values.length - 15][0]
+  let number = parseInt(lastMinus15) / 1000
+  number = (Math.round(number) - 1.5) * 1000
+  number = 13491 //
   let index
   if (values && values.length > 0) {
-    index = values.findIndex((value) => value[0] == [date]) + 2
-    const range = `Mercado Libre!AT${index}:CM`
+    index = values.findIndex((value) => value[0] == [number]) + 2
+    const range = `Tienda Nube!AU${index}:CM`
     if (index > 1) await clearData(range)
   }
-  const orders = await getOrders(date)
+  const orders = await getTNOrders(number)
   const array = []
 
   orders.map((order) => {
     array.push(Object.values(order))
   })
 
-  const response = await appendData('Mercado Libre!AT2', array)
+  // fs.writeFileSync(filePath, JSON.stringify(array, null, 2))
+  const response = await appendData('Tienda Nube!AU2', array)
 
   return response
 }
