@@ -27,6 +27,8 @@ const getToken = async () => {
     },
     httpsAgent: new https.Agent({
       keepAlive: true,
+      timeout: 120000,
+      keepAliveMsecs: 120000,
     }),
     timeout: 120000,
   })
@@ -48,6 +50,8 @@ const getIds = async (token, from) => {
       headers: header,
       httpsAgent: new https.Agent({
         keepAlive: true,
+        timeout: 120000,
+        keepAliveMsecs: 120000,
       }),
       timeout: 120000,
     })
@@ -74,6 +78,8 @@ export const getOrders = async (from) => {
         headers: header,
         httpsAgent: new https.Agent({
           keepAlive: true,
+          timeout: 120000,
+          keepAliveMsecs: 120000,
         }),
         timeout: 120000,
       })
@@ -152,7 +158,7 @@ const setOrder = (object, objectDocs, objectShip, objectPayment) => {
   } = parseMPforML(objectPayment)
 
   const order = {
-    formula: `=LEFTB("${dateUsFormat}";10)`,
+    formula: dateUsFormat,
     orderId: `="${object.id}"`,
     dateCreated: new Date(object.date_created)
       .toLocaleString('es-AR', {

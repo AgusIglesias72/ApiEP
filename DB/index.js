@@ -87,7 +87,7 @@ const getDateMeli = () => {
   let date = new Date()
   date.setDate(date.getDate() - 15)
   date = date.toISOString().split('T')[0]
-  return '2022-12-27'
+  return date
 }
 
 export const PostOrdersToMeli = async () => {
