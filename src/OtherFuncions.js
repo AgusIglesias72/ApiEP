@@ -351,9 +351,15 @@ export const PostPersonal = async (object) => {
   }
 }
 
-export const getRevendedores = async () => {
+export const getRevendedores = async (params) => {
+  let canal
+  if (params === 'Revendedores') {
+    canal = 'Reventa'
+  } else if (params === 'Empresas') {
+    canal = 'Empresa'
+  }
+
   try {
-    const canal = 'Reventa'
     let data = fs.readFileSync('./DB/data.json', 'utf8')
     data = JSON.parse(data)
     data = data.filter((order) => order.CanalVenta === canal)
@@ -386,7 +392,13 @@ export const getRevendedores = async () => {
         ),
       }
       const OrdenesAsociadas = Array.from(
-        new Set(revendedorData.map((order) => order.IdPedido))
+        new Set(
+          revendedorData.map((order) => {
+            const { IdPedido, FechaCompra } = order
+
+            return { IdPedido, FechaCompra }
+          })
+        )
       )
 
       return {
@@ -405,7 +417,12 @@ export const getRevendedores = async () => {
 
     allRevendedores.sort((a, b) => b.CantidadCompras - a.CantidadCompras)
 
-    return { status: 200, message: 'Ok', data: allRevendedores }
+    return {
+      status: 200,
+      message: 'Ok',
+      cantidad: data.length,
+      data: allRevendedores,
+    }
   } catch (err) {
     console.log(err)
     return { status: 400, message: 'Error' }

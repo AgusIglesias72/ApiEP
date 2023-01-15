@@ -15,8 +15,8 @@ orders.get('/', (req, res) => {
 })
 
 orders.get('/:id', async (req, res) => {
-  if (req.params.id === 'Revendedores') {
-    const data = await getRevendedores()
+  if (req.params.id === 'Revendedores' || req.params.id === 'Empresas') {
+    const data = await getRevendedores(req.params.id)
     return res.status(data.status).send(data)
   }
 

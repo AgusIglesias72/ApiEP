@@ -95,6 +95,10 @@ export const getOrders = async (from) => {
         `https://api.mercadolibre.com/shipments/${shipId}`,
         {
           headers: header,
+          httpsAgent: new https.Agent({
+            keepAlive: true,
+          }),
+          timeout: 60000,
         }
       )
       const mpId = body.id
