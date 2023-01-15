@@ -28,7 +28,7 @@ const getToken = async () => {
     httpsAgent: new https.Agent({
       keepAlive: true,
     }),
-    timeout: 60000,
+    timeout: 120000,
   })
   const token = res.data.access_token
   return token
@@ -49,7 +49,7 @@ const getIds = async (token, from) => {
       httpsAgent: new https.Agent({
         keepAlive: true,
       }),
-      timeout: 60000,
+      timeout: 120000,
     })
     const body = res.data
 
@@ -75,7 +75,7 @@ export const getOrders = async (from) => {
         httpsAgent: new https.Agent({
           keepAlive: true,
         }),
-        timeout: 60000,
+        timeout: 120000,
       })
       const resDni = await axios.get(
         `https://api.mercadolibre.com/orders/${id}/billing_info`,
@@ -84,7 +84,7 @@ export const getOrders = async (from) => {
           httpsAgent: new https.Agent({
             keepAlive: true,
           }),
-          timeout: 60000,
+          timeout: 120000,
         }
       )
 
@@ -98,7 +98,7 @@ export const getOrders = async (from) => {
           httpsAgent: new https.Agent({
             keepAlive: true,
           }),
-          timeout: 60000,
+          timeout: 120000,
         }
       )
       const mpId = body.id
@@ -112,7 +112,7 @@ export const getOrders = async (from) => {
           httpsAgent: new https.Agent({
             keepAlive: true,
           }),
-          timeout: 60000,
+          timeout: 120000,
         }
       )
 
