@@ -85,7 +85,7 @@ const toArrayOfObjects = (keys, values) => {
 
 const getDateMeli = () => {
   let date = new Date()
-  date.setDate(date.getDate() - 15)
+  date.setDate(date.getDate() - 10)
   date = date.toISOString().split('T')[0]
   return date
 }
