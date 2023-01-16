@@ -123,6 +123,7 @@ export const PostOrdersToTN = async () => {
   const lastMinus15 = values[values.length - 15][0]
   let number = parseInt(lastMinus15) / 1000
   number = (Math.round(number) - 1.5) * 1000
+  console.log(number)
   // number = 15000
   let index
   if (values && values.length > 0) {
