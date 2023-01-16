@@ -10,8 +10,8 @@ await getOrdersFromGoogle()
 
 console.log('Mercado Libre')
 
-// await PostOrdersToMeli()
+await PostOrdersToMeli()
 
 console.log('Tienda Nube')
 
-// await PostOrdersToTN()
+await PostOrdersToTN()
