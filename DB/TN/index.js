@@ -20,8 +20,8 @@ const getAllOrdersTN = async (from) => {
 
   //   const fields = 'id,number'
   const url = (i, field) =>
-    `https://api.tiendanube.com/v1/1705915/orders?fields=${field}&page=${i}&per_page=200`
-  for (let i = 1; i < 2; i++) {
+    `https://api.tiendanube.com/v1/1705915/orders?fields=${field}&page=${i}`
+  for (let i = 1; i < 100; i++) {
     console.log(i)
     const res = await axios.get(url(i, fields), {
       headers: headers,
@@ -37,6 +37,10 @@ const getAllOrdersTN = async (from) => {
 
     body.map((order) => {
       data.push(order)
+
+      if (order.number === from) {
+        i = 100
+      }
     })
   }
   let ordersArray = new Set(data)
@@ -55,21 +59,40 @@ export const getTNOrders = async (from, to) => {
         !item.shipping_option.includes('DHL')
       ) {
         while (snBody === null) {
-          const snRes = await axios.get(
-            `https://api.shipnow.com.ar/orders?external_reference=${item.id}`,
-            {
-              headers: {
-                Accept: 'application/json',
-                Authorization: AUTH_SHIPNOW,
-              },
-              httpsAgent: new https.Agent({
-                keepAlive: true,
-              }),
-              timeout: 60000,
+          try {
+            const snRes = await axios.get(
+              `https://api.shipnow.com.ar/orders?external_reference=${item.id}`,
+              {
+                headers: {
+                  Accept: 'application/json',
+                  Authorization: AUTH_SHIPNOW,
+                },
+                httpsAgent: new https.Agent({
+                  keepAlive: true,
+                }),
+                timeout: 60000,
+              }
+            )
+            if (snRes.status === 200) {
+              snBody = snRes.data
             }
-          )
-          if (snRes.status === 200) {
-            snBody = snRes.data
+          } catch (error) {
+            const snRes = await axios.get(
+              `https://api.shipnow.com.ar/orders?external_reference=${item.id}`,
+              {
+                headers: {
+                  Accept: 'application/json',
+                  Authorization: AUTH_SHIPNOW,
+                },
+                httpsAgent: new https.Agent({
+                  keepAlive: true,
+                }),
+                timeout: 60000,
+              }
+            )
+            if (snRes.status === 200) {
+              snBody = snRes.data
+            }
           }
         }
       }
@@ -77,29 +100,46 @@ export const getTNOrders = async (from, to) => {
       let mpBody = null
       if (item.gateway_name === 'Mercado Pago') {
         while (mpBody === null) {
-          const mpRes = await axios.get(
-            `https://api.mercadopago.com/v1/payments/search?external_reference=${item.id}`,
-            {
-              headers: {
-                Authorization: AUTH_MERCADOPAGO,
-                Accept: 'application/json',
-              },
-              httpsAgent: new https.Agent({
-                keepAlive: true,
-              }),
-              timeout: 60000,
+          try {
+            const mpRes = await axios.get(
+              `https://api.mercadopago.com/v1/payments/search?external_reference=${item.id}`,
+              {
+                headers: {
+                  Authorization: AUTH_MERCADOPAGO,
+                  Accept: 'application/json',
+                },
+                httpsAgent: new https.Agent({
+                  keepAlive: true,
+                }),
+                timeout: 60000,
+              }
+            )
+            if (mpRes.status === 200) {
+              mpBody = mpRes.data
             }
-          )
-          if (mpRes.status === 200) {
-            mpBody = mpRes.data
+          } catch (error) {
+            const mpRes = await axios.get(
+              `https://api.mercadopago.com/v1/payments/search?external_reference=${item.id}`,
+              {
+                headers: {
+                  Authorization: AUTH_MERCADOPAGO,
+                  Accept: 'application/json',
+                },
+                httpsAgent: new https.Agent({
+                  keepAlive: true,
+                }),
+                timeout: 60000,
+              }
+            )
+            if (mpRes.status === 200) {
+              mpBody = mpRes.data
+            }
           }
         }
       }
 
       for (let i = 0; i < item.products.length; i++) {
-        console.log(item.paid_at)
         const order = setOrder(i, item, snBody, mpBody)
-        console.log(order)
         orders.push(order)
       }
     })

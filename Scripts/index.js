@@ -8,4 +8,4 @@ await getOrdersFromGoogle()
 
 await PostOrdersToMeli()
 
-// await PostOrdersToTN()
+await PostOrdersToTN()

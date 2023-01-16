@@ -112,7 +112,7 @@ export const PostOrdersToMeli = async () => {
     const response = await appendData('Mercado Libre!AT2', array)
     return response
   } catch (error) {
-    console.log(error)
+    console.log(error.message)
   }
 }
 
@@ -122,7 +122,7 @@ export const PostOrdersToTN = async () => {
   const lastMinus15 = values[values.length - 15][0]
   let number = parseInt(lastMinus15) / 1000
   number = (Math.round(number) - 1.5) * 1000
-  number = 13491 //
+  // number = 15000
   let index
   if (values && values.length > 0) {
     index = values.findIndex((value) => value[0] == [number]) + 2
@@ -136,7 +136,6 @@ export const PostOrdersToTN = async () => {
     array.push(Object.values(order))
   })
 
-  // fs.writeFileSync(filePath, JSON.stringify(array, null, 2))
   const response = await appendData('Tienda Nube!AU2', array)
 
   return response
