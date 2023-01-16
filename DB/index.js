@@ -66,7 +66,7 @@ const numericKeys = [
   'RefExterna',
 ]
 
-const filePath = join(process.cwd(), './DB/test.json')
+const filePath = join(process.cwd(), './DB/data.json')
 
 const toArrayOfObjects = (keys, values) => {
   return values.map((value) => {
@@ -93,6 +93,7 @@ const getDateMeli = () => {
 export const PostOrdersToMeli = async () => {
   try {
     const date = getDateMeli()
+    console.log(date)
     const orders = await getOrders(date)
 
     const res = await getRows('Mercado Libre!AT2:AT')

@@ -4,8 +4,14 @@ import {
   PostOrdersToTN,
 } from '../DB/index.js'
 
+console.log('Get Orders')
+
 await getOrdersFromGoogle()
 
-await PostOrdersToMeli()
+console.log('Mercado Libre')
 
-await PostOrdersToTN()
+// await PostOrdersToMeli()
+
+console.log('Tienda Nube')
+
+// await PostOrdersToTN()

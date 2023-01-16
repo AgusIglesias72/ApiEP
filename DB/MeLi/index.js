@@ -28,7 +28,6 @@ const getToken = async () => {
     httpsAgent: new https.Agent({
       keepAlive: true,
       timeout: 120000,
-      keepAliveMsecs: 120000,
     }),
     timeout: 120000,
   })
@@ -51,7 +50,6 @@ const getIds = async (token, from) => {
       httpsAgent: new https.Agent({
         keepAlive: true,
         timeout: 120000,
-        keepAliveMsecs: 120000,
       }),
       timeout: 120000,
     })
@@ -79,7 +77,6 @@ export const getOrders = async (from) => {
         httpsAgent: new https.Agent({
           keepAlive: true,
           timeout: 120000,
-          keepAliveMsecs: 120000,
         }),
         timeout: 120000,
       })
