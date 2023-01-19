@@ -91,30 +91,25 @@ const getDateMeli = () => {
 }
 
 export const PostOrdersToMeli = async () => {
-  try {
-    const date = getDateMeli()
-    console.log(date)
-    const orders = await getOrders(date)
+  const date = getDateMeli()
+  const orders = await getOrders(date)
 
-    const res = await getRows('Mercado Libre!AT2:AT')
-    const values = res.data.values
-    let index
-    if (values && values.length > 0) {
-      index = values.findIndex((value) => value[0] == [date]) + 2
-      const range = `Mercado Libre!AT${index}:CM`
-      if (index > 1) await clearData(range)
-    }
-    const array = []
-
-    orders.map((order) => {
-      array.push(Object.values(order))
-    })
-
-    const response = await appendData('Mercado Libre!AT2', array)
-    return response
-  } catch (error) {
-    console.log(error.message)
+  const res = await getRows('Mercado Libre!AT2:AT')
+  const values = res.data.values
+  let index
+  if (values && values.length > 0) {
+    index = values.findIndex((value) => value[0] == [date]) + 2
+    const range = `Mercado Libre!AT${index}:CM`
+    if (index > 1) await clearData(range)
   }
+  const array = []
+
+  orders.map((order) => {
+    array.push(Object.values(order))
+  })
+
+  const response = await appendData('Mercado Libre!AT2', array)
+  return response
 }
 
 export const PostOrdersToTN = async () => {
