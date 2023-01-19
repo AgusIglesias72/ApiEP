@@ -82,7 +82,6 @@ export const getOrders = async (from) => {
           httpsAgent: new https.Agent({
             keepAlive: true,
           }),
-          timeout: 120000,
         }
       )
 
@@ -96,7 +95,6 @@ export const getOrders = async (from) => {
           httpsAgent: new https.Agent({
             keepAlive: true,
           }),
-          timeout: 120000,
         }
       )
       const mpId = body.id
@@ -110,7 +108,6 @@ export const getOrders = async (from) => {
           httpsAgent: new https.Agent({
             keepAlive: true,
           }),
-          timeout: 120000,
         }
       )
 
