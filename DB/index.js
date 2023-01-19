@@ -98,6 +98,7 @@ export const PostOrdersToMeli = async () => {
   const values = res.data.values
   let index
   if (values && values.length > 0) {
+    console.log('Obtener los datos funcionó bien')
     index = values.findIndex((value) => value[0] == [date]) + 2
     const range = `Mercado Libre!AT${index}:CM`
     if (index > 1) await clearData(range)
@@ -107,7 +108,7 @@ export const PostOrdersToMeli = async () => {
   orders.map((order) => {
     array.push(Object.values(order))
   })
-
+  console.log('Haciendo el append')
   const response = await appendData('Mercado Libre!AT2', array)
   return response
 }
@@ -118,14 +119,7 @@ export const PostOrdersToTN = async () => {
   const lastMinus15 = values[values.length - 15][0]
   let number = parseInt(lastMinus15) / 1000
   number = (Math.round(number) - 1.5) * 1000
-  console.log(number)
-  // number = 15000
-  let index
-  if (values && values.length > 0) {
-    index = values.findIndex((value) => value[0] == [number]) + 2
-    const range = `Tienda Nube!AU${index}:CM`
-    if (index > 1) await clearData(range)
-  }
+
   const orders = await getTNOrders(number)
   const array = []
 
@@ -133,9 +127,17 @@ export const PostOrdersToTN = async () => {
     array.push(Object.values(order))
   })
 
-  const response = await appendData('Tienda Nube!AU2', array)
+  let index
+  if (values && values.length > 0) {
+    index = values.findIndex((value) => value[0] == [number]) + 2
+    const range = `Tienda Nube!AU${index}:CM`
+    if (index > 1) await clearData(range)
+  }
+  setTimeout(async () => {
+    const response = await appendData('Tienda Nube!AU2', array)
 
-  return response
+    return response
+  }, 5000)
 }
 
 export const getOrdersFromGoogle = async () => {

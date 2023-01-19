@@ -61,7 +61,6 @@ const getIds = async (token, from) => {
 export const getOrders = async (from) => {
   const token = await getToken()
   const ids = await getIds(token, from)
-  console.log(token)
   const header = {
     Authorization: `Bearer ${token}`,
   }
@@ -115,6 +114,7 @@ export const getOrders = async (from) => {
       const bodyDoc = resDni.data
       const bodyPayment = resPayment.data
 
+      console.log(body.date_created, body.id)
       const order = setOrder(body, bodyDoc, bodyShip, bodyPayment)
       return order
     })
