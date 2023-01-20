@@ -39,7 +39,7 @@ jobs:
           npm install
           node Scripts/index.js
           git config user.name apiep
-          git config user.name agusiglesias72@gmail.com
+          git config user.email agusiglesias72@gmail.com
           git add -A
           git commit -m "[apiep] Update Sales"
           git push origin main
