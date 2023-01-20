@@ -110,8 +110,10 @@ export const PostOrdersToMeli = async () => {
       array.push(Object.values(order))
     })
     console.log('Haciendo el append')
-    const response = await appendData('Mercado Libre!AT2', array)
-    return response
+    setTimeout(async () => {
+      const response = await appendData('Mercado Libre!AT2', array)
+      return response
+    }, 10000)
   } catch (error) {
     console.log(error)
     return error
