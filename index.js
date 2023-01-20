@@ -22,7 +22,7 @@ const PORT = process.env.PORT ?? 8000
 const authentication = (req, res, next) => {
   const { authorization } = req.headers
   if (!authorization) {
-    return res.status(401).send({ error: 'No authorization sent' })
+    return res.status(400).send({ error: 'No authorization sent' })
   }
   const [_, token] = authorization.split(' ')
   if (token !== AUTH_TOKEN) {
