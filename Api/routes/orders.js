@@ -26,18 +26,18 @@ orders.get('/:id', async (req, res) => {
 
 orders.post('/:canal', async (req, res) => {
   if (req.params.canal === 'mayorista') {
-    const res = await PostMayorista(req.body)
-    return res
+    const response = await PostMayorista(req.body)
+    return res.status(response.status).send(response)
   }
 
   if (req.params.canal === 'regalo') {
-    const res = await PostRegalo(req.body)
-    return res
+    const response = await PostRegalo(req.body)
+    return res.status(response.status).send(response)
   }
 
   if (req.params.canal === 'personal') {
-    const res = await PostPersonal(req.body)
-    return res
+    const response = await PostPersonal(req.body)
+    return res.status(response.status).send(response)
   }
 
   return res.status(400).send({

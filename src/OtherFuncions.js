@@ -224,6 +224,7 @@ export const PostRegalo = async (object) => {
 
 export const PostPersonal = async (object) => {
   try {
+    console.log(object)
     const rows = await getRows('Personales!A2:A')
 
     const values = rows.data.values
@@ -264,7 +265,7 @@ export const PostPersonal = async (object) => {
       costo_envio,
     } = object
 
-    const productos = object.productos
+    const productos = object.productos ? object.productos : []
 
     const append = []
 
@@ -370,7 +371,7 @@ export const getRevendedores = async (params) => {
 
     let allRevendedores = revendedoresArray.map((Nombre) => {
       const revendedorData = data.filter((order) => order.Nombre === Nombre)
-      const Email = revendedorData[0].Email
+      const Email = revendedorData[0].Mail
       const CUIT = revendedorData[0].DNI
       const Telefono = revendedorData[0].Telefono
       const Provincia = revendedorData[0].Provincia
