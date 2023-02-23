@@ -87,8 +87,8 @@ const getDateMeli = () => {
   let date = new Date()
   date.setDate(date.getDate() - 10)
   date = date.toISOString().split('T')[0]
-  // return date
-  return '2023-02-02'
+  return date
+  // return '2023-02-02'
 }
 
 export const PostOrdersToMeli = async () => {
@@ -128,7 +128,7 @@ export const PostOrdersToTN = async () => {
   let number = parseInt(lastMinus15) / 1000
   number = (Math.round(number) - 1.5) * 1000
   console.log(number)
-  // number = 15495
+  number = 15494
   const orders = await getTNOrders(number)
   const array = []
 
